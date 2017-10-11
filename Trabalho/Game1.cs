@@ -72,7 +72,8 @@ namespace Trabalho
                 Exit();
             input = Keyboard.GetState();
             // TODO: Add your update logic here
-            terrain.Update(input,cam);
+            cam.Update(input);
+            terrain.Interpolation(cam);
             base.Update(gameTime);
         }
 
