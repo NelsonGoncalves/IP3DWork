@@ -36,3 +36,5 @@ D:\EDJD\2ano\IP3D\IP3DWork\Trabalho\bin\DesktopGL\AnyCPU\Debug\MonoGame.Framewor
 D:\EDJD\2ano\IP3D\IP3DWork\Trabalho\obj\Debug\Trabalho.csprojResolveAssemblyReference.cache
 D:\EDJD\2ano\IP3D\IP3DWork\Trabalho\obj\Debug\Trabalho.exe
 D:\EDJD\2ano\IP3D\IP3DWork\Trabalho\obj\Debug\Trabalho.pdb
+D:\EDJD\2ano\IP3D\IP3DWork\Trabalho\bin\DesktopGL\AnyCPU\Debug\Content\relva.jpg
+D:\EDJD\2ano\IP3D\IP3DWork\Trabalho\bin\DesktopGL\AnyCPU\Debug\Content\relva.xnb
