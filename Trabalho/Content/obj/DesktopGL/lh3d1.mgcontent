@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <SourceFile>D:/EDJD/2ano/IP3D/Trabalho/Trabalho/Content/lh3d1.jpg</SourceFile>
+  <SourceFile>D:/EDJD/2ano/IP3D/IP3DWork/Trabalho/Content/lh3d1.jpg</SourceFile>
   <SourceTime>2017-10-07T17:01:20.4307394+01:00</SourceTime>
-  <DestFile>D:/EDJD/2ano/IP3D/Trabalho/Trabalho/Content/bin/DesktopGL/lh3d1.xnb</DestFile>
-  <DestTime>2017-10-07T17:02:25.0202557+01:00</DestTime>
+  <DestFile>D:/EDJD/2ano/IP3D/IP3DWork/Trabalho/Content/bin/DesktopGL/lh3d1.xnb</DestFile>
+  <DestTime>2017-10-10T14:53:24.4967507+01:00</DestTime>
   <Importer>TextureImporter</Importer>
   <ImporterTime>2017-03-01T15:05:36+00:00</ImporterTime>
   <Processor>TextureProcessor</Processor>
