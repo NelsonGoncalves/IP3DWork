@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <SourceFile>D:/EDJD/2ano/IP3D/IP3DWork/Trabalho/Content/relva.jpg</SourceFile>
-  <SourceTime>2017-10-11T15:04:03.417502+01:00</SourceTime>
+  <SourceTime>2017-10-11T21:40:00.6027413+01:00</SourceTime>
   <DestFile>D:/EDJD/2ano/IP3D/IP3DWork/Trabalho/Content/bin/DesktopGL/relva.xnb</DestFile>
-  <DestTime>2017-10-11T15:05:27.9883665+01:00</DestTime>
+  <DestTime>2017-10-11T21:48:54.043046+01:00</DestTime>
   <Importer>TextureImporter</Importer>
   <ImporterTime>2017-03-01T15:05:36+00:00</ImporterTime>
   <Processor>TextureProcessor</Processor>
