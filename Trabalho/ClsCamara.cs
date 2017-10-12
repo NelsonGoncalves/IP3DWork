@@ -13,54 +13,48 @@ namespace Trabalho
     class ClsCamara : GameComponent
     {
         //Attributes
-        public Matrix worldMatrix, projectionMatrix, viewMatrix;
-        public Vector3 cameraPosition;
-        private Vector3 cameraLookAt;
-        private Vector3 directionBase;
-        Vector2 center;
-        private float cameraVelocity;
-        float yaw, pitch;
-        MouseState preMS;
-        float height, width;
+        public Matrix worldMatrix, projectionMatrix, viewMatrix; // Matrizes reponsáveis pelo render
+        public Vector3 cameraPosition; // Vector que representa a posição da camera no espaço
+        private Vector3 cameraLookAt; // Vector que representa a posição para que a camera está apontar
+        private Vector3 directionBase; // Vector de direção para calcular as rotações e translações
+        private Vector2 center; // Vector para guardar a posição central do device
+        private float cameraVelocity; // Escalar para a velocidade de movimento da camera
+        float yaw, pitch; // para a rotação e inclinação da camera
+        MouseState previousMS; // MouseState para guardar a ultima posição do rato
 
         public ClsCamara(Game game, GraphicsDevice device) : base(game)
         {
-            cameraPosition = new Vector3(60f, 30.0f, 60.0f);
-            directionBase = new Vector3(1.0f, 0.0f, 1.0f);
-            cameraLookAt = cameraPosition + directionBase;
+            cameraPosition = new Vector3(60f, 30.0f, 60.0f); // posição inicial da camera
+            directionBase = new Vector3(1.0f, 0.0f, 1.0f); // vector a direcionar para x=z
+            cameraLookAt = cameraPosition + directionBase; // posição para qual a camera está apontar
 
-            center = new Vector2(device.Viewport.Width / 2, device.Viewport.Height / 2);
-            height = device.Viewport.Height;
-            cameraVelocity = 0.1f;
-
+            center = new Vector2(device.Viewport.Width / 2, device.Viewport.Height / 2);//definir o centro do ecrã
+            cameraVelocity = 0.1f; // definir a velocidade de movimento da camera
+            // inicializar o yaw e pitch
             yaw = MathHelper.ToRadians(45f);
-
             pitch = MathHelper.ToRadians(45f);
-
+            // Matrix responsável pela posição do objeto no espaço
             worldMatrix = Matrix.Identity;
-            // Calcula a aspectRatio, a view matrix e a projeção
+            // Calcula a aspectRatioe inicializa a View e Projection Matrix
             float aspectRatio = device.Viewport.AspectRatio;
-            // Matrix de view
             viewMatrix = Matrix.CreateLookAt(cameraPosition, cameraLookAt, Vector3.Up);
-            // Matrix de perspective
-            projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(45.0f), aspectRatio, 0.0001f, 1000.0f);
+            projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(45.0f), aspectRatio, 0.01f, 1000.0f);
         }
-
         public void Update(KeyboardState kb, MouseState ms)
         {
-            
             Debug.WriteLine("CamX:" + cameraPosition.X + "CamZ:" + cameraPosition.Z);
             //rato
-            if (ms.Position.X > preMS.Position.X)
+           
+            if (ms.Position.X > previousMS.Position.X)
                 yaw -= MathHelper.ToRadians(1.0f);
-            if (ms.Position.X < preMS.Position.X)
+            if (ms.Position.X < previousMS.Position.X)
                 yaw += MathHelper.ToRadians(1.0f);
-            if (ms.Position.Y > preMS.Position.Y)
+            if (ms.Position.Y > previousMS.Position.Y)
                 pitch += MathHelper.ToRadians(1.0f);
-            if (ms.Position.Y < preMS.Position.Y)
+            if (ms.Position.Y < previousMS.Position.Y)
                 pitch -= MathHelper.ToRadians(1.0f);
 
-            preMS = ms;
+            previousMS = ms;
             
             // teclado
             if (kb.IsKeyDown(Keys.D))
@@ -79,7 +73,7 @@ namespace Trabalho
             {
                 this.pitch -= MathHelper.ToRadians(1.0f);
             }
-
+            // calcul
             Matrix rotation = Matrix.CreateFromYawPitchRoll(yaw, pitch, 0);
             Vector3 direction = Vector3.Transform(this.directionBase, rotation);
             Debug.WriteLine("direction:" + direction);
@@ -97,6 +91,7 @@ namespace Trabalho
             this.worldMatrix = rotation * Matrix.CreateTranslation(cameraPosition);
             this.viewMatrix = Matrix.CreateLookAt(cameraPosition, cameraLookAt, Vector3.Up);
             
+            // Colission detection v0.000000001
             if (cameraPosition.X > 127)
                 cameraPosition.X = 126;
             if (cameraPosition.X < 1)
