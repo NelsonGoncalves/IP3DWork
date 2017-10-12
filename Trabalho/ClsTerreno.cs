@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,27 +19,25 @@ namespace Trabalho
         IndexBuffer indexBuffer;
         Matrix worldMatrix;
         BasicEffect effect;
-        Texture2D heightMap,relva;
+        Texture2D heightMap, relva;
 
         Color[] heightMapColors;
-        float[,] heightData;
+        private float[,] heightData;
         float scale;
         int terrainWidth, terrainHeight;
         int indexCount;
-
-
 
         public ClsTerreno(GraphicsDevice device, ContentManager content, ClsCamara cam)
         {
             heightMap = content.Load<Texture2D>("lh3d1");
             relva = content.Load<Texture2D>("relva");
 
-            scale = 0.1f;
+            scale = 0.01f;
 
             effect = new BasicEffect(device);
             //this.worldMatrix = cam.worldMatrix;
             effect.Projection = cam.projectionMatrix;
-            effect.World = cam.worldMatrix;
+            effect.World = Matrix.Identity;
             effect.View = cam.viewMatrix;
             effect.VertexColorEnabled = false;
             effect.TextureEnabled = true;
@@ -67,12 +66,12 @@ namespace Trabalho
         private void CreateVertices(GraphicsDevice device)
         {
             vertex = new VertexPositionNormalTexture[(terrainHeight) * (terrainWidth)];
-            for (int x = 0; x < terrainWidth; x++)
+            for (int z = 0; z < terrainWidth; z++)
             {
-                for (int z = 0; z < terrainHeight; z++)
+                for (int x = 0; x < terrainHeight; x++)
                 {
                     // (16383)
-                    vertex[x + (z * terrainHeight)] = new VertexPositionNormalTexture(new Vector3(x, heightData[x, z], z), new Vector3(0, 1, 0), new Vector2(x%2, x%2));
+                    vertex[x + (z * terrainHeight)] = new VertexPositionNormalTexture(new Vector3(x, heightData[x, z], z), new Vector3(0, 1, 0), new Vector2((x % 2),(z%2)));
                 }
             }
             vertexBuffer = new VertexBuffer(device,
@@ -103,44 +102,50 @@ namespace Trabalho
         }
         public void Interpolation(ClsCamara cam)
         {
-            
-            // vectores perto da camera
-            float xa, xb, xc, xd, za, zb, zc, zd, ya, yb, yc, yd;
-            // distancias
-            float da, db, dc, dd;
-            // alturas na posicção x,z
-            float yab, ycd, yfinal;
+            //Debug.WriteLine("X:" + cam.cameraPosition.X + "Y:" + cam.cameraPosition.Y + "Z:" + cam.cameraPosition.Z);
+            //Debug.WriteLine("DirectionX" + cam.cameraTarget.X + "DirectionY:" + cam.cameraTarget.Y + "DirectionZ:" + cam.cameraTarget.Z);
+            //Debug.WriteLine("camY:" + cam.cameraPosition.Y);
+            if (cam.cameraPosition.X >= 1 && cam.cameraPosition.X < terrainWidth-1 && cam.cameraPosition.Z >= 1 && cam.cameraPosition.Z < terrainHeight-1)
+            {
+                // vectores perto da camera
+                float xa, xb, xc, xd, za, zb, zc, zd, ya, yb, yc, yd;
+                // distancias
+                float daX, dbX, dcX, ddX,daZ,dcZ;
+                // alturas na posicção x,z
+                float yab, ycd, yfinal;
 
-            xa = (int)cam.position.X;
-            za = (int)cam.position.Z;
-            xb = (int)xa + 1;
-            zb = (int)za;
-            xc = (int)xa;
-            zc = (int)za + 1;
-            xd = (int)xa + 1;
-            zd = (int)za + 1;
-            ya = heightData[(int)xa, (int)za];
-            yb = heightData[(int)xb, (int)zb];
-            yc = heightData[(int)xc, (int)zc];
-            yd = heightData[(int)xd, (int)zd];
-            da = cam.position.X - xa;
-            db = 1 - da;
-            dc = da;
-            dd = 1 - dc;
+                xa = (int)cam.cameraPosition.X;
+                za = (int)cam.cameraPosition.Z;
+                xb = xa + 1;
+                zb = za;
+                xc = xa;
+                zc = za + 1;
+                xd = xa + 1;
+                zd = za + 1;
+                ya = heightData[(int)xa, (int)za];
+                yb = heightData[(int)xb, (int)zb];
+                yc = heightData[(int)xc, (int)zc];
+                yd = heightData[(int)xd, (int)zd];
+                daX = cam.cameraPosition.X - xa;
+                dbX = 1 - daX;
+                dcX = daX;
+                ddX = 1 - dcX;
+                daZ = cam.cameraPosition.Z - zb;
+                dcZ = 1 - daZ;
 
-            yab = (db * ya) + (da * yb);
-            ycd = (dd * yc) + (dc * yd);
+                yab = (dbX * ya) + (daX * yb);
+                ycd = (ddX * yc) + (dcX * yd);
 
-            yfinal = dc*dd*yab + da*db*ycd;
-            cam.position.Y = yfinal;
+                yfinal = yab * daZ + ycd * dcZ;
+                cam.cameraPosition.Y = yfinal+5;
+            }
         }
-
         public void Draw(GraphicsDevice device, ClsCamara cam)
         {
             // World Matrix
-            effect.World = cam.worldMatrix;
-            //effect.View = cam.viewMatrix;
-            //effect.Projection = cam.projectionMatrix;
+            Interpolation(cam);
+            effect.View = cam.viewMatrix;
+            effect.Projection = cam.projectionMatrix;
             //Indica o efeito para desenhar os eixos
             // Draw dos lados do prisma
             device.SetVertexBuffer(vertexBuffer);

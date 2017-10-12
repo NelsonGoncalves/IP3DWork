@@ -14,6 +14,7 @@ namespace Trabalho
         ClsCamara cam;
         ClsTerreno terrain;
         KeyboardState input;
+        MouseState msInput;
         ClsEixos eixos;
         
         public Game1()
@@ -32,7 +33,7 @@ namespace Trabalho
         {
             // TODO: Add your initialization logic here
             
-            cam = new ClsCamara(GraphicsDevice);
+            cam = new ClsCamara(this,GraphicsDevice);
 
             eixos = new ClsEixos(GraphicsDevice, cam);
 
@@ -71,9 +72,10 @@ namespace Trabalho
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
             input = Keyboard.GetState();
+            msInput = Mouse.GetState();
             // TODO: Add your update logic here
-            cam.Update(input);
-            terrain.Interpolation(cam);
+            cam.Update(input,msInput);
+            
             base.Update(gameTime);
         }
 
