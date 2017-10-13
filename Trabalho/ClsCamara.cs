@@ -16,7 +16,7 @@ namespace Trabalho
         public Matrix worldMatrix, projectionMatrix, viewMatrix; // Matrizes reponsáveis pelo render
         public Vector3 cameraPosition; // Vector que representa a posição da camera no espaço
         private Vector3 cameraLookAt; // Vector que representa a posição para que a camera está apontar
-        private Vector3 directionBase; // Vector de direção para calcular as rotações e translações
+        static private Vector3 directionBase; // Vector de direção para calcular as rotações e translações
         private Vector2 center; // Vector para guardar a posição central do device
         private float cameraVelocity; // Escalar para a velocidade de movimento da camera
         float yaw, pitch; // para a rotação e inclinação da camera
@@ -34,11 +34,18 @@ namespace Trabalho
             yaw = MathHelper.ToRadians(45f);
             pitch = MathHelper.ToRadians(45f);
             // Matrix responsável pela posição do objeto no espaço
-            worldMatrix = Matrix.Identity;
+            
             // Calcula a aspectRatioe inicializa a View e Projection Matrix
             float aspectRatio = device.Viewport.AspectRatio;
-            viewMatrix = Matrix.CreateLookAt(cameraPosition, cameraLookAt, Vector3.Up);
-            projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(45.0f), aspectRatio, 0.01f, 1000.0f);
+            worldMatrix = Matrix.Identity;
+            viewMatrix = Matrix.CreateLookAt(cameraPosition,
+                cameraLookAt,
+                Vector3.Up);
+            projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(45.0f),
+                aspectRatio,
+                0.01f,
+                1000.0f);
+            
         }
         public void Update(KeyboardState kb, MouseState ms)
         {
@@ -73,9 +80,10 @@ namespace Trabalho
             {
                 this.pitch -= MathHelper.ToRadians(1.0f);
             }
-            // calcul
+            // calcula a matrix de rotação
             Matrix rotation = Matrix.CreateFromYawPitchRoll(yaw, pitch, 0);
-            Vector3 direction = Vector3.Transform(this.directionBase, rotation);
+            // calcula a direção
+            Vector3 direction = Vector3.Transform(directionBase, rotation);
             Debug.WriteLine("direction:" + direction);
 
             if (kb.IsKeyDown(Keys.W))

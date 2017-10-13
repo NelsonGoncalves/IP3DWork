@@ -57,10 +57,8 @@ namespace Trabalho
             heightMap.GetData(heightMapColors);// popular o array de cores
             // incialização do array de alturas
             heightData = new float[terrainWidth, terrainHeight];//(128,128)
-            // popular o array de alturas
             for (int x = 0; x < terrainWidth; x++)//(127)
                 for (int z = 0; z < terrainHeight; z++) // (128)
-                    // para cada posição ir buscar o valor R da cor e multiplicar por um escalar(permite facilmente manipular as alturas)
                     heightData[x, z] = heightMapColors[x + (z * terrainWidth)].R * scale;
 
         }
@@ -74,8 +72,8 @@ namespace Trabalho
             {
                 for (int x = 0; x < terrainHeight; x++)
                 {
-                    vertex[x + (z * terrainHeight)] = new VertexPositionNormalTexture(new Vector3(
-                        x, heightData[x, z], z), //Cria cada vertice com uma altura diferente acedendo ao heightData para cada (x,z)
+                    vertex[x + (z * terrainHeight)] = new VertexPositionNormalTexture(
+                        new Vector3(x, heightData[x, z], z), //Cria cada vertice com uma altura diferente acedendo ao heightData para cada (x,z)
                         new Vector3(0, 1, 0),// vector Up
                         new Vector2((x % 2), (z % 2))); // x: pares serão sempre 0 e impares 1
                 }
@@ -117,45 +115,34 @@ namespace Trabalho
             //Debug.WriteLine("X:" + cam.cameraPosition.X + "Y:" + cam.cameraPosition.Y + "Z:" + cam.cameraPosition.Z);
             //Debug.WriteLine("DirectionX" + cam.cameraTarget.X + "DirectionY:" + cam.cameraTarget.Y + "DirectionZ:" + cam.cameraTarget.Z);
             //Debug.WriteLine("camY:" + cam.cameraPosition.Y);
-
-            // valores das cordenadas dos 4 vertices vizinhos à posição da camera
-            float xa, xb, xc, xd, za, zb, zc, zd, ya, yb, yc, yd;
-            // distancias entre a posição da camera e a posição dos 4 vértices vizinhos
-            float daX, dbX, dcX, ddX, daZ, dcZ;
-            // alturas na posicção x,z
-            float yab, ycd, yfinal;
             // definir as cordenadas dos pontos vizinhos
-            xa = (int)cam.cameraPosition.X;
-            za = (int)cam.cameraPosition.Z;
-            xb = xa + 1;
-            zb = za;
-            xc = xa;
-            zc = za + 1;
-            xd = xa + 1;
-            zd = za + 1;
-            // alturas guardadas no array respectivo
-            ya = heightData[(int)xa, (int)za];
-            yb = heightData[(int)xb, (int)zb];
-            yc = heightData[(int)xc, (int)zc];
-            yd = heightData[(int)xd, (int)zd];
+            int x = (int)cam.cameraPosition.X;
+            int z = (int)cam.cameraPosition.Z;
+            // valores das cordenadas dos 4 vertices vizinhos à posição da camera 
+            // alturas na posicção x,z
+            float ya = heightData[x, z];
+            float yb = heightData[x + 1, z];
+            float yc = heightData[x, z + 1];
+            float yd = heightData[x + 1, z + 1];
+            // distancias entre a posição da camera e a posição dos 4 vértices vizinhos
             // calcular as distancias da posição da camera em X e Z com os vertices vizinhos
             // X
-            daX = cam.cameraPosition.X - xa; //0.6
-            dbX = 1 - daX; // 0.4
-            dcX = daX; // 0.6
-            ddX = 1 - dcX; // 0.4
+            float daX = cam.cameraPosition.X - x; //0.6
+            float dbX = 1 - daX; // 0.4
+            float dcX = daX; // 0.6
+            float ddX = 1 - dcX; // 0.4
             // Z
-            daZ = cam.cameraPosition.Z - zb;//0.8
-            dcZ = 1 - daZ; //0.2
+            float daZ = cam.cameraPosition.Z - z;//0.8
+            float dcZ = 1 - daZ; //0.2
             // altura media entre a,b && c,d
-            yab = (dbX * ya) + (daX * yb); // (0.4*5.4f)+(0.6*6.2f)
-            ycd = (ddX * yc) + (dcX * yd); // (0.4*5.2f)+(0.6*6.0f)
+            float yab = (dbX * ya) + (daX * yb); // (0.4*5.4f)+(0.6*6.2f)
+            float ycd = (ddX * yc) + (dcX * yd); // (0.4*5.2f)+(0.6*6.0f)
             // 
-            yfinal = yab * daZ + ycd * dcZ; // (0.4*5.4f)+(0.6*6.2f) * 0.8 + (0.4*5.2f)+(0.6*6.0f) * 0.2
+            float yfinal = yab * dcZ + ycd * daZ; // (0.4*5.4f)+(0.6*6.2f) * 0.8 + (0.4*5.2f)+(0.6*6.0f) * 0.2
             cam.cameraPosition.Y = yfinal + 5; // + 5 para a camera ficar à superficie o terreno
         }
-        public void Update(ClsCamara cam,GameTime gameTime)
-        {
+        public void Update(ClsCamara cam, GameTime gameTime)
+        {        
             Interpolation(cam);
         }
         public void Draw(GraphicsDevice device, ClsCamara cam)
