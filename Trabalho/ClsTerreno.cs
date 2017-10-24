@@ -18,11 +18,11 @@ namespace Trabalho
         short[] index; // Array de indices
         VertexBuffer vertexBuffer; // buffer para os vértices
         IndexBuffer indexBuffer; // buffer para os indices
-        Matrix worldMatrix; // World Matrix
         BasicEffect effect; // efeito básico a usar
         Texture2D heightMap, relva; // height map e textura
         Color[] heightMapColors; // Array de cores que receberá as cores do height map
-        private float[,] heightData; // Array bidimensional que receberá os valores de altura do terreno
+        private Vector3[,] heightData; // Array bidimensional que receberá os valores de altura do terreno
+        private Vector3[,] normals;
         float scale; // escala para definir as alturas do terreno
         int terrainWidth, terrainHeight; // Altura e largura do terreno
         int indexCount; // counter para o numero de indices
@@ -43,7 +43,16 @@ namespace Trabalho
             effect.TextureEnabled = true; // ligar as texturas
             effect.Texture = relva; // atribuir a relva como textura do terreno
 
+            effect.LightingEnabled = true; // liga a iluminação
+            effect.DirectionalLight0.DiffuseColor = new Vector3(1, 1, 1); // a red light
+            effect.DirectionalLight0.Direction = new Vector3(1, 1, 1);  // coming along the x-axis
+            effect.DirectionalLight0.SpecularColor = new Vector3(1, 1, 1); // with green highlights
+            //effect.AmbientLightColor = new Vector3(0.5f, 0.5f, 0.5f);
+            //effect.EmissiveColor = new Vector3(1, 1, 0);
+
+
             LoadHeightData(heightMap); // Metodo responsável pelos valores das alturas do terreno
+            CreateNormals(); // Cria as normais de cada vértice (iluminação)
             CreateVertices(device); // Metodo responsável por criar os vértices e os respectivo buffer
             CreateIndices(device); // Metodo responável por criar os indices e os respectivo buffer
         }
@@ -56,11 +65,124 @@ namespace Trabalho
             heightMapColors = new Color[terrainWidth * terrainHeight];//(16384)
             heightMap.GetData(heightMapColors);// popular o array de cores
             // incialização do array de alturas
-            heightData = new float[terrainWidth, terrainHeight];//(128,128)
-            for (int x = 0; x < terrainWidth; x++)//(127)
-                for (int z = 0; z < terrainHeight; z++) // (128)
-                    heightData[x, z] = heightMapColors[x + (z * terrainWidth)].R * scale;
+            heightData = new Vector3[terrainWidth, terrainHeight];//(128,128)
+            for (int z = 0; z < terrainWidth; z++)//(127)
+                for (int x = 0; x < terrainHeight; x++) // (128)
+                    heightData[x, z] = new Vector3(x, heightMapColors[x + (z * terrainWidth)].R * scale, z);
 
+        }
+        // Create normals
+        private void CreateNormals()
+        {
+            Vector3 v1, v2, v3, v4, v5, v6, v7, v8;
+            Vector3 n, n1, n2, n3, n4, n5, n6, n7, n8;
+            normals = new Vector3[terrainWidth, terrainHeight];
+            // centro
+            for (int z = 0; z < terrainWidth; z++)
+            {
+                for (int x = 0; x < terrainHeight; x++)
+                {
+                    if (z == 0 && x == 0)
+                    {
+                        // back left corner - 2 tri 3 vertices
+                        v1 = heightData[x, z + 1] - heightData[x, z];
+                        v2 = heightData[x + 1, z + 1] - heightData[x, z];
+                        v3 = heightData[x + 1, z] - heightData[x, z];
+                        n1 = Vector3.Cross(v1, v2); n2 = Vector3.Cross(v2, v3);
+                        n = (n1 + n2) / 2.0f;
+                    }
+                    else if ((z > 0 && z < (terrainWidth - 1)) && x == 0)
+                    {
+                        // left edge - 4 tri 5 vertices
+                        v1 = heightData[x, z - 1] - heightData[x, z];
+                        v2 = heightData[x + 1, z - 1] - heightData[x, z];
+                        v3 = heightData[x + 1, z] - heightData[x, z];
+                        v4 = heightData[x + 1, z + 1] - heightData[x, z];
+                        v5 = heightData[x, z + 1] - heightData[x, z];
+                        n1 = Vector3.Cross(v1, v2); n2 = Vector3.Cross(v2, v3); n3 = Vector3.Cross(v3, v4); n4 = Vector3.Cross(v4, v5);
+                        n = (n1 + n2 + n3 + n4) / 4.0f;
+                    }
+                    else if (z == (terrainHeight - 1) && x == 0)
+                    {
+                        // front left corner - 2 tri 3 vertices
+                        v1 = heightData[x, z - 1] - heightData[x, z];
+                        v2 = heightData[x + 1, z - 1] - heightData[x, z];
+                        v3 = heightData[x + 1, z] - heightData[x, z];
+                        n1 = Vector3.Cross(v1, v2); n2 = Vector3.Cross(v2, v3);
+                        n = (n1 + n2) / 2.0f;
+                    }
+                    else if (z == (terrainHeight - 1) && (x > 0 && x < (terrainWidth - 1)))
+                    {
+                        // front edge - 4 tri 5 vertices
+                        v1 = heightData[x - 1, z] - heightData[x, z];
+                        v2 = heightData[x - 1, z - 1] - heightData[x, z];
+                        v3 = heightData[x, z - 1] - heightData[x, z];
+                        v4 = heightData[x + 1, z - 1] - heightData[x, z];
+                        v5 = heightData[x + 1, z] - heightData[x, z];
+                        n1 = Vector3.Cross(v1, v2); n2 = Vector3.Cross(v2, v3); n3 = Vector3.Cross(v3, v4); n4 = Vector3.Cross(v4, v5);
+                        n = (n1 + n2 + n3) / 3.0f;
+                    }
+                    else if (z == (terrainHeight - 1) && x == (terrainWidth - 1))
+                    {
+                        // front right corner - 2 tri 3 vertices
+                        v1 = heightData[x - 1, z] - heightData[x, z];
+                        v2 = heightData[x - 1, z - 1] - heightData[x, z];
+                        v3 = heightData[x - 1, z] - heightData[x, z];
+                        n1 = Vector3.Cross(v1, v2); n2 = Vector3.Cross(v2, v3);
+                        n = (n1 + n2) / 2.0f;
+                    }
+                    else if ((z > 0 && z < (terrainHeight - 1)) && x == (terrainWidth - 1))
+                    {
+                        // right edge - 4 tri 5 vertices
+                        v1 = heightData[x, z - 1] - heightData[x, z];
+                        v2 = heightData[x - 1, z - 1] - heightData[x, z];
+                        v3 = heightData[x - 1, z] - heightData[x, z];
+                        v4 = heightData[x - 1, z + 1] - heightData[x, z];
+                        v5 = heightData[x, z + 1] - heightData[x, z];
+                        n1 = Vector3.Cross(v1, v2); n2 = Vector3.Cross(v2, v3); n3 = Vector3.Cross(v3, v4); n4 = Vector3.Cross(v4, v5);
+                        n = (n1 + n2 + n3 + n4) / 4.0f;
+                    }
+                    else if (z == 0 && x == (terrainWidth - 1))
+                    {
+                        // back right corner - 2 tri 3 vertices
+                        v1 = heightData[x - 1, z] - heightData[x, z];
+                        v2 = heightData[x - 1, z + 1] - heightData[x, z];
+                        v3 = heightData[x, z + 1] - heightData[x, z];
+                        n1 = Vector3.Cross(v1, v2); n2 = Vector3.Cross(v2, v3);
+                        n = (n1 + n2) / 2.0f;
+                    }
+                    else if (z == 0 && (x > 0 && x < (terrainWidth - 1)))
+                    {
+                        // back edge - 4 tri 5 vertices
+                        v1 = heightData[x - 1, z] - heightData[x, z];
+                        v2 = heightData[x - 1, z + 1] - heightData[x, z];
+                        v3 = heightData[x, z + 1] - heightData[x, z];
+                        v4 = heightData[x + 1, z + 1] - heightData[x, z];
+                        v5 = heightData[x + 1, z] - heightData[x, z];
+                        n1 = Vector3.Cross(v1, v2); n2 = Vector3.Cross(v2, v3); n3 = Vector3.Cross(v3, v4); n4 = Vector3.Cross(v4, v5);
+                        n = (n1 + n2 + n3 + n4) / 4.0f;
+                    }
+                    else
+                    {
+                        // internal - 8 tri 8 vertices
+                        v1 = heightData[x, z - 1] - heightData[x, z];
+                        v2 = heightData[x + 1, z - 1] - heightData[x, z];
+                        v3 = heightData[x + 1, z] - heightData[x, z];
+                        v4 = heightData[x + 1, z + 1] - heightData[x, z];
+                        v5 = heightData[x, z + 1] - heightData[x, z];
+                        v6 = heightData[x - 1, z + 1] - heightData[x, z];
+                        v7 = heightData[x - 1, z] - heightData[x, z];
+                        v8 = heightData[x - 1, z - 1] - heightData[x, z];
+
+                        n1 = Vector3.Cross(v1, v2); n2 = Vector3.Cross(v2, v3); n3 = Vector3.Cross(v3, v4);
+                        n4 = Vector3.Cross(v4, v5); n5 = Vector3.Cross(v5, v6); n6 = Vector3.Cross(v6, v7);
+                        n7 = Vector3.Cross(v7, v8); n8 = Vector3.Cross(v8, v1);
+                        n = (n1 + n2 + n3 + n4 + n5 + n6 + n7 + n8) / 8.0f;
+                    }
+                    n.Normalize();
+                    normals[x, z] = new Vector3(n.X, n.Y, n.Z);
+                }
+            }
         }
         // Preenche o array com os vertices
         private void CreateVertices(GraphicsDevice device)
@@ -73,8 +195,8 @@ namespace Trabalho
                 for (int x = 0; x < terrainHeight; x++)
                 {
                     vertex[x + (z * terrainHeight)] = new VertexPositionNormalTexture(
-                        new Vector3(x, heightData[x, z], z), //Cria cada vertice com uma altura diferente acedendo ao heightData para cada (x,z)
-                        new Vector3(0, 1, 0),// vector Up
+                        new Vector3(x, heightData[x, z].Y, z), //Cria cada vertice com uma altura diferente acedendo ao heightData para cada (x,z)
+                        normals[x, z],// vector Up
                         new Vector2((x % 2), (z % 2))); // x: pares serão sempre 0 e impares 1
                 }
             }
@@ -97,7 +219,6 @@ namespace Trabalho
             {
                 for (int zi = 0; zi < terrainHeight; zi++)
                 {
-
                     index[(2 * zi) + 0 + (2 * xi * terrainHeight)] = (short)(zi * terrainWidth + xi); //0,128,256,...,16382
                     index[(2 * zi) + 1 + (2 * xi * terrainWidth)] = (short)(zi * terrainHeight + 1 + xi); //1,129,257,...,16383
                 }
@@ -120,10 +241,10 @@ namespace Trabalho
             int z = (int)cam.cameraPosition.Z;
             // valores das cordenadas dos 4 vertices vizinhos à posição da camera 
             // alturas na posicção x,z
-            float ya = heightData[x, z];
-            float yb = heightData[x + 1, z];
-            float yc = heightData[x, z + 1];
-            float yd = heightData[x + 1, z + 1];
+            float ya = heightData[x, z].Y;
+            float yb = heightData[x + 1, z].Y;
+            float yc = heightData[x, z + 1].Y;
+            float yd = heightData[x + 1, z + 1].Y;
             // distancias entre a posição da camera e a posição dos 4 vértices vizinhos
             // calcular as distancias da posição da camera em X e Z com os vertices vizinhos
             // X
@@ -131,25 +252,24 @@ namespace Trabalho
             float dbX = 1 - daX; // 0.4
             float dcX = daX; // 0.6
             float ddX = 1 - dcX; // 0.4
-            // Z
+                                 // Z
             float daZ = cam.cameraPosition.Z - z;//0.8
             float dcZ = 1 - daZ; //0.2
-            // altura media entre a,b && c,d
+                                 // altura media entre a,b && c,d
             float yab = (dbX * ya) + (daX * yb); // (0.4*5.4f)+(0.6*6.2f)
             float ycd = (ddX * yc) + (dcX * yd); // (0.4*5.2f)+(0.6*6.0f)
-            // 
+                                                 // 
             float yfinal = yab * dcZ + ycd * daZ; // (0.4*5.4f)+(0.6*6.2f) * 0.8 + (0.4*5.2f)+(0.6*6.0f) * 0.2
             cam.cameraPosition.Y = yfinal + 5; // + 5 para a camera ficar à superficie o terreno
         }
         public void Update(ClsCamara cam, GameTime gameTime)
-        {        
+        {
             Interpolation(cam);
         }
         public void Draw(GraphicsDevice device, ClsCamara cam)
         {
             // update da View e da Projection Matrix devido ao input do utilizador
             effect.View = cam.viewMatrix;
-            effect.Projection = cam.projectionMatrix;
             // definir o vertexBuffer e indexBuffer a usar;
             device.SetVertexBuffer(vertexBuffer);
             device.Indices = indexBuffer;

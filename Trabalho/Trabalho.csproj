@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="ClsCamara.cs" />
     <Compile Include="ClsEixos.cs" />
+    <Compile Include="ClsTank.cs" />
     <Compile Include="ClsTerreno.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="Program.cs" />
@@ -107,6 +108,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="app.manifest" />
+    <None Include="Content\xwing.x" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\lh3d1.jpg">

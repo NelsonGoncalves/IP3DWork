@@ -16,6 +16,7 @@ namespace Trabalho
         KeyboardState input;
         MouseState msInput;
         ClsEixos eixos;
+        ClsTank tank;
         
         public Game1()
         {
@@ -38,6 +39,8 @@ namespace Trabalho
             eixos = new ClsEixos(GraphicsDevice, cam);
 
             terrain = new ClsTerreno(GraphicsDevice, Content, cam);
+
+            tank = new ClsTank(GraphicsDevice,Content, cam);
             base.Initialize();
         }
 
