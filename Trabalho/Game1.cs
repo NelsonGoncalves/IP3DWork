@@ -79,6 +79,7 @@ namespace Trabalho
             // TODO: Add your update logic here
             cam.Update(input,msInput);
             terrain.Update(cam, gameTime);
+            tank.Update(input,terrain,cam);
             
             base.Update(gameTime);
         }
@@ -94,6 +95,7 @@ namespace Trabalho
             // TODO: Add your drawing code here
             terrain.Draw(GraphicsDevice, cam);
             eixos.Draw(GraphicsDevice, cam);
+            tank.DrawModel(cam);
             base.Draw(gameTime);
         }
     }

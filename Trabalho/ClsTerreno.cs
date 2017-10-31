@@ -43,6 +43,7 @@ namespace Trabalho
             effect.TextureEnabled = true; // ligar as texturas
             effect.Texture = relva; // atribuir a relva como textura do terreno
 
+            effect.AmbientLightColor = new Vector3(1, 1, 1);
             effect.LightingEnabled = true; // liga a iluminação
             effect.DirectionalLight0.DiffuseColor = new Vector3(1, 1, 1); // a red light
             effect.DirectionalLight0.Direction = new Vector3(1, 1, 1);  // coming along the x-axis
@@ -77,7 +78,7 @@ namespace Trabalho
             Vector3 v1, v2, v3, v4, v5, v6, v7, v8;
             Vector3 n, n1, n2, n3, n4, n5, n6, n7, n8;
             normals = new Vector3[terrainWidth, terrainHeight];
-            // centro
+
             for (int z = 0; z < terrainWidth; z++)
             {
                 for (int x = 0; x < terrainHeight; x++)
@@ -262,6 +263,19 @@ namespace Trabalho
             float yfinal = yab * dcZ + ycd * daZ; // (0.4*5.4f)+(0.6*6.2f) * 0.8 + (0.4*5.2f)+(0.6*6.0f) * 0.2
             cam.cameraPosition.Y = yfinal + 5; // + 5 para a camera ficar à superficie o terreno
         }
+        // Metodo que devolve a normal numa determinada posição do terreno
+        public Vector3 GetNormal(Vector3 position)
+        {
+            Vector3 normal = normals[(int)position.X, (int)position.Z];
+            return normal;
+        }
+        // Metodo que devolve a altura numa determinada posição do terreno
+        public float GetHeight(Vector3 position)
+        {
+            float height = heightData[(int)position.X, (int)position.Z].Y;
+            return height;
+        }
+
         public void Update(ClsCamara cam, GameTime gameTime)
         {
             Interpolation(cam);

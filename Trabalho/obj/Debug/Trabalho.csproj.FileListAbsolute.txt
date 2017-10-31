@@ -20,3 +20,8 @@ D:\EDJD\2ano\IP3D\IP3DWork\Trabalho\obj\Debug\Trabalho.csprojResolveAssemblyRefe
 D:\EDJD\2ano\IP3D\IP3DWork\Trabalho\obj\Debug\Trabalho.exe
 D:\EDJD\2ano\IP3D\IP3DWork\Trabalho\obj\Debug\Trabalho.pdb
 D:\EDJD\2ano\IP3D\IP3DWork\Trabalho\bin\DesktopGL\AnyCPU\Debug\Content\xwing.xnb
+D:\EDJD\2ano\IP3D\IP3DWork\Trabalho\bin\DesktopGL\AnyCPU\Debug\Content\engine_diff_tex.xnb
+D:\EDJD\2ano\IP3D\IP3DWork\Trabalho\bin\DesktopGL\AnyCPU\Debug\Content\engine_diff_tex_0.xnb
+D:\EDJD\2ano\IP3D\IP3DWork\Trabalho\bin\DesktopGL\AnyCPU\Debug\Content\tank.xnb
+D:\EDJD\2ano\IP3D\IP3DWork\Trabalho\bin\DesktopGL\AnyCPU\Debug\Content\turret_alt_diff_tex.xnb
+D:\EDJD\2ano\IP3D\IP3DWork\Trabalho\bin\DesktopGL\AnyCPU\Debug\Content\turret_alt_diff_tex_0.xnb
