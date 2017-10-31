@@ -14,7 +14,9 @@ namespace Trabalho
         ClsCamara cam;
         ClsTerreno terrain;
         KeyboardState input;
+        MouseState msInput;
         ClsEixos eixos;
+        ClsTank tank;
         
         public Game1()
         {
@@ -32,11 +34,13 @@ namespace Trabalho
         {
             // TODO: Add your initialization logic here
             
-            cam = new ClsCamara(GraphicsDevice);
+            cam = new ClsCamara(this,GraphicsDevice);
 
             eixos = new ClsEixos(GraphicsDevice, cam);
 
             terrain = new ClsTerreno(GraphicsDevice, Content, cam);
+
+            tank = new ClsTank(GraphicsDevice,Content, cam);
             base.Initialize();
         }
 
@@ -71,9 +75,12 @@ namespace Trabalho
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
             input = Keyboard.GetState();
+            msInput = Mouse.GetState();
             // TODO: Add your update logic here
-            cam.Update(input);
-            terrain.Interpolation(cam);
+            cam.Update(input,msInput);
+            terrain.Update(cam, gameTime);
+            tank.Update(input,terrain,cam);
+            
             base.Update(gameTime);
         }
 
@@ -87,6 +94,8 @@ namespace Trabalho
 
             // TODO: Add your drawing code here
             terrain.Draw(GraphicsDevice, cam);
+            eixos.Draw(GraphicsDevice, cam);
+            tank.DrawModel(cam);
             base.Draw(gameTime);
         }
     }

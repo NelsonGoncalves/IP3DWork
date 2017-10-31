@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="ClsCamara.cs" />
     <Compile Include="ClsEixos.cs" />
+    <Compile Include="ClsTank.cs" />
     <Compile Include="ClsTerreno.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="Program.cs" />
@@ -107,6 +108,21 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="app.manifest" />
+    <None Include="Content\engine_diff_tex.xnb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Content\engine_diff_tex_0.xnb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Content\tank.xnb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Content\turret_alt_diff_tex.xnb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Content\turret_alt_diff_tex_0.xnb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\lh3d1.jpg">

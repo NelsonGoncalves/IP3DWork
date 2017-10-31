@@ -33,7 +33,7 @@ namespace Trabalho
         }
         private void CreateGeometry()
         {
-            float axisLenght = 1f; // Tamanho da linha em cada sinal do eixo
+            float axisLenght = 30f; // Tamanho da linha em cada sinal do eixo
             int vertexCount = 6; // Vamos usar 6 vértices
             vertices = new VertexPositionColor[vertexCount];
             // Linha sobre o eixo X
@@ -53,10 +53,11 @@ namespace Trabalho
             Color.White);
 
         }
-        public void Draw(GraphicsDevice device)
+        public void Draw(GraphicsDevice device,ClsCamara cam)
         {
             // World Matrix
-            //effect.World = worldMatrix;
+            effect.View = cam.viewMatrix;
+            effect.Projection = cam.projectionMatrix;
             //Indica o efeito para desenhar os eixos
             effect.CurrentTechnique.Passes[0].Apply();
             device.DrawUserPrimitives<VertexPositionColor>(PrimitiveType.LineList, vertices, 0, 3);
