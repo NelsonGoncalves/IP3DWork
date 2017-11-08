@@ -12,38 +12,82 @@ namespace Trabalho
 {
     class ClsTank
     {
-        Model model;
-        BasicEffect effect;
         Matrix world, view, projection;
         // Turret and Cannon bones
         ModelBone turretBone;
         ModelBone cannonBone;
         // Default transforms
-        Matrix cannonTransform;
-        Matrix turretTransform;
-        // Keeps all transforms
-        Matrix[] boneTransforms;
 
         float scale;
-        float turretAngle = 0.0f;
-        float cannonAngle = 0.0f;
 
-        Vector3 position;
-        Vector3 directionHorizontal;
+
+        private Model model; // modelo
+        private GraphicsDevice device; // device
+        private Vector3 position; // posição do tank
+        private Vector3 directionHorizontal; // direção base
+        private float tankRotation;
+        private float turretAngle = 0.0f;
+        private float cannonAngle = 0.0f;
+        private Matrix cannonTransform;
+        private Matrix turretTransform;
+        private Matrix[] boneTransforms;        // Keeps all transforms
+        public Vector3 Position
+        {
+            get
+            {
+                return position;
+            }
+            set
+            {
+                position = value;
+            }
+        }
+        public float TankRotation
+        {
+            get
+            {
+                return tankRotation;
+            }
+            set
+            {
+                tankRotation = MathHelper.WrapAngle(value);
+            }
+        }
+        public float TurretAngle
+        {
+            get
+            {
+                return turretAngle;
+            }
+            set
+            {
+                turretAngle = MathHelper.WrapAngle(value);
+            }
+        }
+        public float CannonAngle
+        {
+            get
+            {
+                return cannonAngle;
+            }
+            set
+            {
+                cannonAngle = MathHelper.Clamp(value,
+                    MathHelper.ToRadians(-90),
+                    MathHelper.ToRadians(0));
+            }
+        }
 
 
         public ClsTank(GraphicsDevice device, ContentManager content, ClsCamara cam)
         {
             float aspectRatio = device.Viewport.AspectRatio;
-            position = cam.cameraPosition;
+            position = new Vector3(64f, 30f, 64f);
             directionHorizontal = new Vector3(1, 0, 1);
 
             world = Matrix.CreateScale(0.005f);
-            view = Matrix.CreateLookAt(new Vector3(0, 5, 5), Vector3.Zero, Vector3.Up); // ViewMatrix será universal
-            projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(45.0f),
-                            aspectRatio,
-                            0.01f,
-                            100.0f); ; // Projection matrix será universal
+            view = cam.viewMatrix; // ViewMatrix será universal
+            projection = cam.projectionMatrix; // Projection matrix será universal
 
             model = LoadModel("Tank", content);
             scale = 0.01f;
@@ -69,7 +113,8 @@ namespace Trabalho
             //}
             return novoModelo;
         }
-        public void Update(KeyboardState kb, ClsTerreno terreno,ClsCamara cam)
+
+        public void Update(KeyboardState kb, ClsTerreno terreno, ClsCamara cam)
         {
             if (kb.IsKeyDown(Keys.Left))
                 turretAngle += MathHelper.ToRadians(1);
@@ -79,15 +124,17 @@ namespace Trabalho
                 cannonAngle += MathHelper.ToRadians(1);
             if (kb.IsKeyDown(Keys.Down))
                 cannonAngle -= MathHelper.ToRadians(1);
-
             Matrix translation = Matrix.CreateTranslation(position);
-            Vector3 tankNormal =  terreno.GetNormal(position); // normal do terreno na posição do tank
+            position = terreno.GetHeight(position);
+            Vector3 tankNormal = terreno.GetNormal(position); // normal do terreno na posição do tank
             Vector3 tankRight = Vector3.Cross(directionHorizontal, tankNormal);
             Vector3 tankDirection = Vector3.Cross(tankNormal, tankRight);
             Matrix rotation = Matrix.Identity;
             rotation.Forward = tankDirection;
             rotation.Up = tankNormal;
             rotation.Right = tankRight;
+
+            //            position += tankDirection;
 
             // Applies a transformations to any bone (Root, Turret, Cannon, …
             //model.Root.Transform = Matrix.CreateTranslation(new Vector3(0f, 0f, 1f));
@@ -108,8 +155,8 @@ namespace Trabalho
                 foreach (BasicEffect effect in mesh.Effects)
                 {
                     effect.World = boneTransforms[mesh.ParentBone.Index];
-                    effect.View = view;
-                    effect.Projection = projection;
+                    effect.View = cam.viewMatrix;
+                    effect.Projection = cam.projectionMatrix;
 
                     effect.EnableDefaultLighting();
                 }

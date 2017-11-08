@@ -33,7 +33,7 @@ namespace Trabalho
             heightMap = content.Load<Texture2D>("lh3d1");
             relva = content.Load<Texture2D>("relva");
             // set da escala para a altura do terreno
-            scale = 0.1f;
+            scale = 0.06f;
             // inicialização do efeito a usar
             effect = new BasicEffect(device); // instanciar
             effect.Projection = cam.projectionMatrix; // Projection matrix será universal
@@ -181,7 +181,7 @@ namespace Trabalho
                         n = (n1 + n2 + n3 + n4 + n5 + n6 + n7 + n8) / 8.0f;
                     }
                     n.Normalize();
-                    normals[x, z] = new Vector3(n.X, n.Y, n.Z);
+                    normals[x, z] = n; //new Vector3(n.X, n.Y, n.Z);
                 }
             }
         }
