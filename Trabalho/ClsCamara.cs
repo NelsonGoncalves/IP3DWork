@@ -14,6 +14,8 @@ namespace Trabalho
     {
         //Attributes
         public Matrix worldMatrix, projectionMatrix, viewMatrix; // Matrizes reponsáveis pelo render
+        Matrix rotationMatrix;
+        private Vector3 direction;
         public Vector3 cameraPosition; // Vector que representa a posição da camera no espaço
         private Vector3 cameraLookAt; // Vector que representa a posição para que a camera está apontar
         static private Vector3 directionBase; // Vector de direção para calcular as rotações e translações
@@ -48,6 +50,8 @@ namespace Trabalho
                 aspectRatio,
                 0.01f,
                 1000.0f);
+            rotationMatrix = Matrix.CreateFromYawPitchRoll(yaw, pitch, 0);
+            direction = Vector3.Transform(directionBase, rotationMatrix);
             #endregion
         }
         public void Update(KeyboardState kb, MouseState ms,ClsTerreno terreno)
@@ -86,8 +90,8 @@ namespace Trabalho
             }
             #endregion
             // calcula a matrix de rotação e direção
-            Matrix rotation = Matrix.CreateFromYawPitchRoll(yaw, pitch, 0);
-            Vector3 direction = Vector3.Transform(directionBase, rotation);
+            rotationMatrix = Matrix.CreateFromYawPitchRoll(yaw, pitch, 0);
+            direction = Vector3.Transform(directionBase, rotationMatrix);
 
             #region Movement
             if (kb.IsKeyDown(Keys.W))
@@ -98,7 +102,7 @@ namespace Trabalho
             {
                 this.cameraPosition -= this.cameraVelocity * direction;
             }
-            cameraLookAt = cameraPosition + direction;
+            this.cameraLookAt = cameraPosition + direction;
             //this.worldMatrix = rotation * Matrix.CreateTranslation(cameraPosition);
             this.viewMatrix = Matrix.CreateLookAt(cameraPosition, cameraLookAt, Vector3.Up);
             #endregion

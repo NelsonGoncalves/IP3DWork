@@ -37,7 +37,8 @@ namespace Trabalho
             eixos = new ClsEixos(GraphicsDevice, cam);
 
             terrain = new ClsTerreno(GraphicsDevice, Content, cam);
-            StartNewRound();
+            //StartNewRound();
+            tanks.Add(new ClsTank(GraphicsDevice, Content, new Vector3(64, 30, 64)));
             base.Initialize();
         }
         protected override void LoadContent()

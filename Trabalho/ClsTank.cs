@@ -16,7 +16,6 @@ namespace Trabalho
         private Model model; // modelo 
         private Matrix tank; // world Matrix
 
-
         private Vector3 rotation;
         private Vector3 positionTank; // posição do tank
         private Vector3 relativeForward, relativeRight;
@@ -209,7 +208,7 @@ namespace Trabalho
             this.Right = Vector3.Cross(relativeForward, Up); // calcular o vector right
             Right.Normalize();
             transformMatrix = Matrix.CreateTranslation(positionTank);
-            rotationMatrix = Matrix.CreateFromYawPitchRoll(yaw, pitch, roll); // Rotação a dar ao tank
+            rotationMatrix = Matrix.CreateFromYawPitchRoll(yaw, pitch, 45f); // Rotação a dar ao tank
             rotationMatrix.Forward = Forward;
             rotationMatrix.Up = Up;
             rotationMatrix.Right = Right;
@@ -218,9 +217,8 @@ namespace Trabalho
             #endregion
             #region Apply transformations to the model bones
             // Applies a transformations to any bone (Root, Turret, Cannon, …
-            transformMatrix = Matrix.CreateTranslation(positionTank); // actualiza a posição do tank
             model.Root.Transform = Matrix.CreateScale(scale) * rotationMatrix * transformMatrix;
-            //
+
             Matrix wheel = Matrix.CreateRotationX(wheelRotation);
             Matrix steer = Matrix.CreateRotationY(steerRotation);
             Matrix turret = Matrix.CreateRotationY(turretRotation);
@@ -250,6 +248,7 @@ namespace Trabalho
                     effect.World = boneTransforms[mesh.ParentBone.Index];
                     effect.View = cam.viewMatrix;
                     effect.Projection = cam.projectionMatrix;
+                   
                     effect.EnableDefaultLighting();
                 }
                 mesh.Draw();

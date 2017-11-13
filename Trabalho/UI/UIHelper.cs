@@ -85,11 +85,11 @@ namespace Trabalho.UI
             p1Rot = 180 - p1Rot;
             UIHelper.SetElementText(uiElements["p1Rotation"], "Angle: " + p1Rot.ToString("N2"));
             UIHelper.SetElementText(uiElements["p1Elevation"], "Elevation: " + p1Elevation.ToString("N2"));
-            float p2Elevation = MathHelper.ToDegrees(tanks[1].TurretRotation) * -1;
-            float p2Rot = MathHelper.ToDegrees(tanks[1].TurretRotation);
-            p2Rot = 180 - p2Rot;
-            UIHelper.SetElementText(uiElements["p2Rotation"], "Angle: " + p2Rot.ToString("N2"));
-            UIHelper.SetElementText(uiElements["p2Elevation"], "Elevation: " + p2Elevation.ToString("N2"));
+            //float p2Elevation = MathHelper.ToDegrees(tanks[1].TurretRotation) * -1;
+            //float p2Rot = MathHelper.ToDegrees(tanks[1].TurretRotation);
+            //p2Rot = 180 - p2Rot;
+            //UIHelper.SetElementText(uiElements["p2Rotation"], "Angle: " + p2Rot.ToString("N2"));
+            //UIHelper.SetElementText(uiElements["p2Elevation"], "Elevation: " + p2Elevation.ToString("N2"));
         }
         #endregion
 
