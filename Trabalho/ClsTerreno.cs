@@ -181,7 +181,7 @@ namespace Trabalho
                         n = (n1 + n2 + n3 + n4 + n5 + n6 + n7 + n8) / 8.0f;
                     }
                     n.Normalize();
-                    normals[x, z] = n; //new Vector3(n.X, n.Y, n.Z);
+                    normals[x, z] = -n; //new Vector3(n.X, n.Y, n.Z);
                 }
             }
         }
@@ -232,14 +232,14 @@ namespace Trabalho
             indexBuffer.SetData<short>(index); // atribuir o array de indices a usar na Draw
         }
         // Faz a interpolação das alturas
-        public void Interpolation(ClsCamara cam)
+        public float Interpolation(Vector3 position)
         {
             //Debug.WriteLine("X:" + cam.cameraPosition.X + "Y:" + cam.cameraPosition.Y + "Z:" + cam.cameraPosition.Z);
             //Debug.WriteLine("DirectionX" + cam.cameraTarget.X + "DirectionY:" + cam.cameraTarget.Y + "DirectionZ:" + cam.cameraTarget.Z);
             //Debug.WriteLine("camY:" + cam.cameraPosition.Y);
             // definir as cordenadas dos pontos vizinhos
-            int x = (int)cam.cameraPosition.X;
-            int z = (int)cam.cameraPosition.Z;
+            int x = (int)position.X;
+            int z = (int)position.Z;
             // valores das cordenadas dos 4 vertices vizinhos à posição da camera 
             // alturas na posicção x,z
             float ya = heightData[x, z].Y;
@@ -249,41 +249,57 @@ namespace Trabalho
             // distancias entre a posição da camera e a posição dos 4 vértices vizinhos
             // calcular as distancias da posição da camera em X e Z com os vertices vizinhos
             // X
-            float daX = cam.cameraPosition.X - x; //0.6
+            float daX = position.X - x; //0.6
             float dbX = 1 - daX; // 0.4
             float dcX = daX; // 0.6
             float ddX = 1 - dcX; // 0.4
                                  // Z
-            float daZ = cam.cameraPosition.Z - z;//0.8
+            float daZ = position.Z - z;//0.8
             float dcZ = 1 - daZ; //0.2
                                  // altura media entre a,b && c,d
             float yab = (dbX * ya) + (daX * yb); // (0.4*5.4f)+(0.6*6.2f)
             float ycd = (ddX * yc) + (dcX * yd); // (0.4*5.2f)+(0.6*6.0f)
                                                  // 
             float yfinal = yab * dcZ + ycd * daZ; // (0.4*5.4f)+(0.6*6.2f) * 0.8 + (0.4*5.2f)+(0.6*6.0f) * 0.2
-            cam.cameraPosition.Y = yfinal + 5; // + 5 para a camera ficar à superficie o terreno
+            position.Y = yfinal; // + 5 para a camera ficar à superficie o terreno
+            return position.Y;
         }
         // Metodo que devolve a normal numa determinada posição do terreno
-        public Vector3 GetNormal(Vector3 position)
+        public Vector3 GetNormalInterpolation(Vector3 position)
         {
-            Vector3 normal = normals[(int)position.X, (int)position.Z];
+            
+            Vector2 upperLeft = new Vector2((int)position.X, (int)position.Z),
+                upperRight = new Vector2((int)position.X + 1, (int)position.Z),
+                lowerLeft = new Vector2((int)position.X, (int)position.Z + 1),
+                lowerRight = new Vector2((int)position.X + 1, (int)position.Z + 1);
+            Vector3 n1 = normals[(int)upperLeft.X, (int)upperLeft.Y],
+                n2 = normals[(int)upperRight.X, (int)upperRight.Y],
+                n3 = normals[(int)lowerLeft.X, (int)lowerLeft.Y],
+                n4 = normals[(int)lowerRight.X, (int)lowerRight.Y];
+
+            float daX = position.X - upperLeft.X; //0.6
+            float dbX = 1 - daX; // 0.4
+            float dcX = daX; // 0.6
+            float ddX = 1 - dcX; // 0.4
+                                 // Z
+            float daZ = position.Z - upperLeft.Y;//0.8
+            float dcZ = 1 - daZ; //0.2
+
+            Vector3 upperN = dbX * n1 + daX * n2;
+            Vector3 lowerN = ddX * n3 + dcX * n4;
+            Vector3 normal = upperN * dcZ + lowerN * daZ;
+
             return normal;
         }
         // Metodo que devolve a altura numa determinada posição do terreno
-        public float GetHeight(Vector3 position)
+        public void Update()
         {
-            float height = heightData[(int)position.X, (int)position.Z].Y;
-            return height;
         }
-
-        public void Update(ClsCamara cam, GameTime gameTime)
-        {
-            Interpolation(cam);
-        }
-        public void Draw(GraphicsDevice device, ClsCamara cam)
+        public void Draw(GraphicsDevice device,ClsCamara cam)
         {
             // update da View e da Projection Matrix devido ao input do utilizador
             effect.View = cam.viewMatrix;
+            effect.Projection = cam.projectionMatrix;
             // definir o vertexBuffer e indexBuffer a usar;
             device.SetVertexBuffer(vertexBuffer);
             device.Indices = indexBuffer;

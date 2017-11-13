@@ -25,3 +25,7 @@ D:\EDJD\2ano\IP3D\IP3DWork\Trabalho\bin\DesktopGL\AnyCPU\Debug\Content\engine_di
 D:\EDJD\2ano\IP3D\IP3DWork\Trabalho\bin\DesktopGL\AnyCPU\Debug\Content\tank.xnb
 D:\EDJD\2ano\IP3D\IP3DWork\Trabalho\bin\DesktopGL\AnyCPU\Debug\Content\turret_alt_diff_tex.xnb
 D:\EDJD\2ano\IP3D\IP3DWork\Trabalho\bin\DesktopGL\AnyCPU\Debug\Content\turret_alt_diff_tex_0.xnb
+D:\EDJD\2ano\IP3D\IP3DWork\Trabalho\bin\DesktopGL\AnyCPU\Debug\Content\buttonUI.png
+D:\EDJD\2ano\IP3D\IP3DWork\Trabalho\bin\DesktopGL\AnyCPU\Debug\Content\buttonUI.xnb
+D:\EDJD\2ano\IP3D\IP3DWork\Trabalho\bin\DesktopGL\AnyCPU\Debug\Content\Pericles14.xnb
+D:\EDJD\2ano\IP3D\IP3DWork\Trabalho\bin\DesktopGL\AnyCPU\Debug\Content\Pericles14.spritefont

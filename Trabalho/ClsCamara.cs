@@ -24,6 +24,10 @@ namespace Trabalho
 
         public ClsCamara(Game game, GraphicsDevice device) : base(game)
         {
+            // camPositon = Tpos - Tdir*d + Tnormal*height
+            // camTarget = cPos + Tdir;
+            //            position += tankDirection;
+
             #region Set Camera
             cameraPosition = new Vector3(64f, 30.0f, 64.0f); // posição inicial da camera
             directionBase = new Vector3(1.0f, 0.0f, 1.0f); // vector a direcionar para x=z
@@ -46,8 +50,9 @@ namespace Trabalho
                 1000.0f);
             #endregion
         }
-        public void Update(KeyboardState kb, MouseState ms)
+        public void Update(KeyboardState kb, MouseState ms,ClsTerreno terreno)
         {
+            cameraPosition.Y = terreno.Interpolation(cameraPosition) +5;
             Debug.WriteLine("CamX:" + cameraPosition.X + "CamZ:" + cameraPosition.Z);
             #region Mouse Input
 
@@ -83,7 +88,8 @@ namespace Trabalho
             // calcula a matrix de rotação e direção
             Matrix rotation = Matrix.CreateFromYawPitchRoll(yaw, pitch, 0);
             Vector3 direction = Vector3.Transform(directionBase, rotation);
-#region Movement
+
+            #region Movement
             if (kb.IsKeyDown(Keys.W))
             {
                 this.cameraPosition += this.cameraVelocity * direction;
@@ -95,7 +101,7 @@ namespace Trabalho
             cameraLookAt = cameraPosition + direction;
             //this.worldMatrix = rotation * Matrix.CreateTranslation(cameraPosition);
             this.viewMatrix = Matrix.CreateLookAt(cameraPosition, cameraLookAt, Vector3.Up);
-#endregion
+            #endregion
             // Colission detection v0.000000001
             if (cameraPosition.X > 127)
                 cameraPosition.X = 126;

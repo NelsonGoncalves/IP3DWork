@@ -12,139 +12,232 @@ namespace Trabalho
 {
     class ClsTank
     {
-        Matrix world, view, projection;
-        // Turret and Cannon bones
-        ModelBone turretBone;
-        ModelBone cannonBone;
-        // Default transforms
-
-        float scale;
+        #region Fields
+        private Model model; // modelo 
+        private Matrix tank; // world Matrix
 
 
-        private Model model; // modelo
-        private GraphicsDevice device; // device
-        private Vector3 position; // posição do tank
-        private Vector3 directionHorizontal; // direção base
-        private float tankRotation;
-        private float turretAngle = 0.0f;
-        private float cannonAngle = 0.0f;
-        private Matrix cannonTransform;
-        private Matrix turretTransform;
+        private Vector3 rotation;
+        private Vector3 positionTank; // posição do tank
+        private Vector3 relativeForward, relativeRight;
+        private Vector3 Up, Forward, Right;
+
+        #region Float Angles
+        private float turretRotation,
+            cannonRotation,
+            hatchRotation,
+            wheelRotation = 0,
+            steerRotation = 0,
+            scale = 0.01f,
+            speed = 0.1f,
+            yaw = 0,
+            pitch = 0,
+            roll = 0;
+        #endregion
+        #region ModelBones
+
+        private ModelBone turretBone,
+            cannonBone,
+            leftBackWheel,
+            rightBackWheel,
+            leftFrontWheel,
+            rightFrontWheel,
+            leftSteer,
+            rightSteer,
+            hatch;
+        #endregion
+        #region Model Trasnform Matrixes
+        private Matrix rotationMatrix,
+            transformMatrix,
+            turretTransform,
+            cannonTransform,
+            leftBackWheelTransform,
+            rightBackWheelTransform,
+            leftFrontWheelTransform,
+            rightFrontWheelTransform,
+            leftSteerTransform,
+            rightSteerTrasnform;
         private Matrix[] boneTransforms;        // Keeps all transforms
+        #endregion
+        #region Public gets and setters
         public Vector3 Position
         {
             get
             {
-                return position;
+                return positionTank;
             }
             set
             {
-                position = value;
+                positionTank = value;
             }
         }
-        public float TankRotation
+        public float TurretRotation
         {
             get
             {
-                return tankRotation;
+                return turretRotation;
             }
             set
             {
-                tankRotation = MathHelper.WrapAngle(value);
+                turretRotation = MathHelper.WrapAngle(value);
             }
         }
-        public float TurretAngle
+        public float CannonRotation
         {
             get
             {
-                return turretAngle;
+                return cannonRotation;
             }
             set
             {
-                turretAngle = MathHelper.WrapAngle(value);
-            }
-        }
-        public float CannonAngle
-        {
-            get
-            {
-                return cannonAngle;
-            }
-            set
-            {
-                cannonAngle = MathHelper.Clamp(value,
+                cannonRotation = MathHelper.Clamp(value,
                     MathHelper.ToRadians(-90),
                     MathHelper.ToRadians(0));
             }
         }
-
-
-        public ClsTank(GraphicsDevice device, ContentManager content, ClsCamara cam)
+        #endregion
+        #endregion
+        public ClsTank(GraphicsDevice device, ContentManager content, Vector3 position)
         {
-            float aspectRatio = device.Viewport.AspectRatio;
-            position = new Vector3(64f, 30f, 64f);
-            directionHorizontal = new Vector3(1, 0, 1);
+            this.model = LoadModel("Tank", content);
+            this.positionTank = position;
+            this.tank = Matrix.Identity;
+            this.rotationMatrix = Matrix.CreateFromYawPitchRoll(rotation.X, rotation.Y, rotation.Z);
+            this.transformMatrix = Matrix.CreateTranslation(positionTank);
+            // definir o forward,right e up que possamos mudar
+            this.relativeForward = this.Forward = Vector3.Forward;
+            this.relativeRight = this.Right = Vector3.Right;
+            this.Up = Vector3.Up;
 
-            world = Matrix.CreateScale(0.005f);
-            view = cam.viewMatrix; // ViewMatrix será universal
-            projection = cam.projectionMatrix; // Projection matrix será universal
-
-            model = LoadModel("Tank", content);
-            scale = 0.01f;
-            // Read bones
+            #region Read the bones
             turretBone = model.Bones["turret_geo"];
             cannonBone = model.Bones["canon_geo"];
-            // Read bone default transforms
+            leftBackWheel = model.Bones["l_back_wheel_geo"];
+            rightBackWheel = model.Bones["r_back_wheel_geo"];
+            leftFrontWheel = model.Bones["l_front_wheel_geo"];
+            rightFrontWheel = model.Bones["r_front_wheel_geo"];
+            leftSteer = model.Bones["l_steer_geo"];
+            rightSteer = model.Bones["r_steer_geo"];
+            hatch = model.Bones["hatch_geo"];
+            #endregion
+            #region Read the default transforms
             turretTransform = turretBone.Transform;
             cannonTransform = cannonBone.Transform;
+            leftBackWheelTransform = leftBackWheel.Transform;
+            rightBackWheelTransform = rightBackWheel.Transform;
+            leftFrontWheelTransform = leftFrontWheel.Transform;
+            rightFrontWheelTransform = rightFrontWheel.Transform;
+            leftSteerTransform = leftSteer.Transform;
+            rightSteerTrasnform = rightSteer.Transform;
             // create array to store final bone transforms
             boneTransforms = new Matrix[model.Bones.Count];
-
+            #endregion
         }
         private Model LoadModel(String assetName, ContentManager content)
         {
             Model novoModelo = content.Load<Model>(assetName);
-            //foreach (ModelMesh mesh in novoModelo.Meshes)
-            //{
-            //    foreach (ModelMeshPart meshPart in mesh.MeshParts)
-            //    {
-            //        meshPart.Effect = effect.Clone();
-            //    }
-            //}
             return novoModelo;
         }
-
-        public void Update(KeyboardState kb, ClsTerreno terreno, ClsCamara cam)
+        public void Update(KeyboardState kb, ClsTerreno terreno, GameTime gameTime)
         {
-            if (kb.IsKeyDown(Keys.Left))
-                turretAngle += MathHelper.ToRadians(1);
-            if (kb.IsKeyDown(Keys.Right))
-                turretAngle -= MathHelper.ToRadians(1);
-            if (kb.IsKeyDown(Keys.Up))
-                cannonAngle += MathHelper.ToRadians(1);
-            if (kb.IsKeyDown(Keys.Down))
-                cannonAngle -= MathHelper.ToRadians(1);
-            Matrix translation = Matrix.CreateTranslation(position);
-            position = terreno.GetHeight(position);
-            Vector3 tankNormal = terreno.GetNormal(position); // normal do terreno na posição do tank
-            Vector3 tankRight = Vector3.Cross(directionHorizontal, tankNormal);
-            Vector3 tankDirection = Vector3.Cross(tankNormal, tankRight);
-            Matrix rotation = Matrix.Identity;
-            rotation.Forward = tankDirection;
-            rotation.Up = tankNormal;
-            rotation.Right = tankRight;
 
-            //            position += tankDirection;
+            #region Movimento
+            // Canhão
+            if (kb.IsKeyDown(Keys.Up) && !kb.IsKeyDown(Keys.Down))
+            {
+                if (this.cannonRotation >= -Math.PI / 4)
+                    this.cannonRotation -= MathHelper.ToRadians(1f);
+            }
+            else if (kb.IsKeyDown(Keys.Down) && !kb.IsKeyDown(Keys.Up))
+            {
+                if (this.cannonRotation <= 0)
+                    this.cannonRotation += MathHelper.ToRadians(1f);
+            }
+            // turret
+            if (kb.IsKeyDown(Keys.Right) && !kb.IsKeyDown(Keys.Left))
+                this.turretRotation += MathHelper.ToRadians(1f);
+            else if (kb.IsKeyDown(Keys.Left) && !kb.IsKeyDown(Keys.Right))
+                this.turretRotation -= MathHelper.ToRadians(1f);
+            // MOVER TANK
+            if (kb.IsKeyDown(Keys.G) && !kb.IsKeyDown(Keys.J))
+            {
+                steerRotation = MathHelper.ToRadians(10f);
 
+                if (kb.IsKeyDown(Keys.Y))
+                    rotation.X += MathHelper.ToRadians(1f);
+                else if (kb.IsKeyDown(Keys.H))
+                    rotation.X -= MathHelper.ToRadians(1f);
+            }
+            else if (kb.IsKeyDown(Keys.J) && !kb.IsKeyDown(Keys.G))
+            {
+                steerRotation = MathHelper.ToRadians(-10f);
+
+                if (kb.IsKeyDown(Keys.Y))
+                    rotation.X -= MathHelper.ToRadians(1f);
+                else if (kb.IsKeyDown(Keys.H))
+                    rotation.X += MathHelper.ToRadians(1f);
+            }
+            else
+            {
+                steerRotation = MathHelper.ToRadians(0f);
+            }
+            // Mantem a rotação dentro de 2*pi (360º)
+            if (rotation.X > 2 * MathHelper.Pi || rotation.X < -2 * MathHelper.Pi)
+                rotation.X = 0;
+
+            if (kb.IsKeyDown(Keys.Y))
+            {
+                this.positionTank -= this.relativeForward * (float)gameTime.ElapsedGameTime.TotalSeconds*speed;
+                this.wheelRotation += MathHelper.ToRadians(1f);
+
+            }
+            if (kb.IsKeyDown(Keys.H))
+            {
+                this.positionTank += this.relativeForward * (float)gameTime.ElapsedGameTime.TotalSeconds*speed;
+                this.wheelRotation -= MathHelper.ToRadians(1f);
+            }
+            #endregion
+            #region Tank position calculations
+            // trasnformar o relative forward e right
+            relativeForward = Vector3.Transform(Vector3.Forward, Matrix.CreateRotationY(rotation.X));
+            relativeForward.Normalize();
+            relativeRight = Vector3.Transform(Vector3.Right, Matrix.CreateRotationY(rotation.X));
+            relativeRight.Normalize();
+
+            this.Up = terreno.GetNormalInterpolation(positionTank);
+            this.Forward = Vector3.Cross(Up, relativeRight);
+            this.Right = Vector3.Cross(relativeForward, Up); // calcular o vector right
+            Right.Normalize();
+            transformMatrix = Matrix.CreateTranslation(positionTank);
+            rotationMatrix = Matrix.CreateFromYawPitchRoll(yaw, pitch, roll); // Rotação a dar ao tank
+            rotationMatrix.Forward = Forward;
+            rotationMatrix.Up = Up;
+            rotationMatrix.Right = Right;
+
+            positionTank.Y = terreno.Interpolation(positionTank); // actualiza a altura do tank em relação ao terreno
+            #endregion
+            #region Apply transformations to the model bones
             // Applies a transformations to any bone (Root, Turret, Cannon, …
-            //model.Root.Transform = Matrix.CreateTranslation(new Vector3(0f, 0f, 1f));
-            model.Root.Transform = Matrix.CreateScale(scale) * rotation * translation;
-            turretBone.Transform = Matrix.CreateRotationY(turretAngle) * turretTransform;
-            cannonBone.Transform = Matrix.CreateRotationX(cannonAngle) * cannonTransform;
+            transformMatrix = Matrix.CreateTranslation(positionTank); // actualiza a posição do tank
+            model.Root.Transform = Matrix.CreateScale(scale) * rotationMatrix * transformMatrix;
+            //
+            Matrix wheel = Matrix.CreateRotationX(wheelRotation);
+            Matrix steer = Matrix.CreateRotationY(steerRotation);
+            Matrix turret = Matrix.CreateRotationY(turretRotation);
+            Matrix cannon = Matrix.CreateRotationX(cannonRotation);
+
+            turretBone.Transform = turret * turretTransform;
+            cannonBone.Transform = cannon * cannonTransform;
+            leftBackWheel.Transform = wheel * leftBackWheelTransform;
+            rightBackWheel.Transform = wheel * rightBackWheelTransform;
+            leftFrontWheel.Transform = wheel * leftFrontWheelTransform;
+            rightFrontWheel.Transform = wheel * rightFrontWheelTransform;
+            leftSteer.Transform = steer * leftSteerTransform;
+            rightSteer.Transform = steer * rightSteerTrasnform;
 
             // Appies transforms to bones in a cascade
             model.CopyAbsoluteBoneTransformsTo(boneTransforms);
-
+            #endregion
         }
         public void DrawModel(ClsCamara cam)
         {
@@ -157,7 +250,6 @@ namespace Trabalho
                     effect.World = boneTransforms[mesh.ParentBone.Index];
                     effect.View = cam.viewMatrix;
                     effect.Projection = cam.projectionMatrix;
-
                     effect.EnableDefaultLighting();
                 }
                 mesh.Draw();

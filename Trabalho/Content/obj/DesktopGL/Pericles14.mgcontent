@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SourceFile>D:/EDJD/2ano/IP3D/IP3DWork/Trabalho/Content/Pericles14.spritefont</SourceFile>
+  <SourceTime>2017-11-12T01:18:58.2279993+00:00</SourceTime>
+  <DestFile>D:/EDJD/2ano/IP3D/IP3DWork/Trabalho/Content/bin/DesktopGL/Pericles14.xnb</DestFile>
+  <DestTime>2017-11-12T01:21:25.6873263+00:00</DestTime>
+  <Importer>FontDescriptionImporter</Importer>
+  <ImporterTime>2017-03-01T15:05:36+00:00</ImporterTime>
+  <Processor>FontDescriptionProcessor</Processor>
+  <ProcessorTime>2017-03-01T15:05:36+00:00</ProcessorTime>
+  <Parameters>
+    <Key>PremultiplyAlpha</Key>
+    <Value>True</Value>
+  </Parameters>
+  <Parameters>
+    <Key>TextureFormat</Key>
+    <Value>Compressed</Value>
+  </Parameters>
+  <Dependencies />
+  <BuildAsset />
+  <BuildOutput />
+</PipelineBuildEvent>
