@@ -28,9 +28,9 @@ namespace Trabalho
             wheelRotation = 0,
             steerRotation = 0,
             scale = 0.01f,
-            speed = 0.1f,
-            yaw = 0,
-            pitch = 0,
+            speed = 1f,
+            yaw = 45,
+            pitch = 45,
             roll = 0;
         #endregion
         #region ModelBones
@@ -213,7 +213,7 @@ namespace Trabalho
             rotationMatrix.Up = Up;
             rotationMatrix.Right = Right;
 
-            positionTank.Y = terreno.Interpolation(positionTank); // actualiza a altura do tank em relação ao terreno
+            positionTank.Y = terreno.Bilinear(positionTank).Y; // actualiza a altura do tank em relação ao terreno
             #endregion
             #region Apply transformations to the model bones
             // Applies a transformations to any bone (Root, Turret, Cannon, …
@@ -232,14 +232,12 @@ namespace Trabalho
             rightFrontWheel.Transform = wheel * rightFrontWheelTransform;
             leftSteer.Transform = steer * leftSteerTransform;
             rightSteer.Transform = steer * rightSteerTrasnform;
-
             // Appies transforms to bones in a cascade
             model.CopyAbsoluteBoneTransformsTo(boneTransforms);
             #endregion
         }
         public void DrawModel(ClsCamara cam)
         {
-
             // Draw the model
             foreach (ModelMesh mesh in model.Meshes)
             {

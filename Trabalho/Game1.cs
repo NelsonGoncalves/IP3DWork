@@ -31,6 +31,8 @@ namespace Trabalho
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
+            graphics.PreferredBackBufferWidth = 480;
+            graphics.PreferredBackBufferHeight = 800;
 
             cam = new ClsCamara(this, GraphicsDevice);
 
@@ -63,27 +65,40 @@ namespace Trabalho
             keyboard = Keyboard.GetState();
             mouse = Mouse.GetState();
 
-            UIHelper.UpdateUI(uiElements, tanks, keyboard, mouse); //UI
+            //UIHelper.UpdateUI(uiElements, tanks, keyboard, mouse); //UI
             cam.Update(keyboard, mouse, terrain); // cam
             foreach (ClsTank tank in tanks) // tanks
-                tank.Update(keyboard, terrain,gameTime);
+                tank.Update(keyboard, terrain, gameTime);
             base.Update(gameTime);
         }
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
-            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            // TODO: Add your drawing code here
-            terrain.Draw(GraphicsDevice,cam);
+
+            // TODO: Add your drawing code here   
+            //UI
+
+
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            GraphicsDevice.BlendState = BlendState.Opaque;
+
+            terrain.Draw(GraphicsDevice, cam);
             foreach (ClsTank tank in tanks)
                 tank.DrawModel(cam);
-            base.Draw(gameTime);
-            //UI
+
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            GraphicsDevice.BlendState = BlendState.Opaque;
+
             spriteBatch.Begin();
             foreach (UIWidget widget in uiElements.Values)
                 widget.Draw(spriteBatch);
             spriteBatch.End();
+
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            GraphicsDevice.BlendState = BlendState.Opaque;
+            base.Draw(gameTime);
+
         }
         public void StartNewRound()
         {
@@ -109,8 +124,6 @@ namespace Trabalho
                     p1Position += new Vector3(64, 0, 64);
                     break;
             }
-            p1Position.Y = terrain.Interpolation(p1Position);
-            p2Position.Y = terrain.Interpolation(p2Position);
             tanks.Add(
             new ClsTank(
             GraphicsDevice,

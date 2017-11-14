@@ -1,8 +1,6 @@
 D:\EDJD\2ano\IP3D\IP3DWork\Trabalho\bin\DesktopGL\AnyCPU\Debug\MonoGame.Framework.dll.config
 D:\EDJD\2ano\IP3D\IP3DWork\Trabalho\bin\DesktopGL\AnyCPU\Debug\Content\lh3d1.jpg
-D:\EDJD\2ano\IP3D\IP3DWork\Trabalho\bin\DesktopGL\AnyCPU\Debug\Content\relva.jpg
 D:\EDJD\2ano\IP3D\IP3DWork\Trabalho\bin\DesktopGL\AnyCPU\Debug\Content\lh3d1.xnb
-D:\EDJD\2ano\IP3D\IP3DWork\Trabalho\bin\DesktopGL\AnyCPU\Debug\Content\relva.xnb
 D:\EDJD\2ano\IP3D\IP3DWork\Trabalho\bin\DesktopGL\AnyCPU\Debug\x86\SDL2.dll
 D:\EDJD\2ano\IP3D\IP3DWork\Trabalho\bin\DesktopGL\AnyCPU\Debug\x64\SDL2.dll
 D:\EDJD\2ano\IP3D\IP3DWork\Trabalho\bin\DesktopGL\AnyCPU\Debug\x86\soft_oal.dll
@@ -29,3 +27,5 @@ D:\EDJD\2ano\IP3D\IP3DWork\Trabalho\bin\DesktopGL\AnyCPU\Debug\Content\buttonUI.
 D:\EDJD\2ano\IP3D\IP3DWork\Trabalho\bin\DesktopGL\AnyCPU\Debug\Content\buttonUI.xnb
 D:\EDJD\2ano\IP3D\IP3DWork\Trabalho\bin\DesktopGL\AnyCPU\Debug\Content\Pericles14.xnb
 D:\EDJD\2ano\IP3D\IP3DWork\Trabalho\bin\DesktopGL\AnyCPU\Debug\Content\Pericles14.spritefont
+D:\EDJD\2ano\IP3D\IP3DWork\Trabalho\bin\DesktopGL\AnyCPU\Debug\Content\sand-texture.xnb
+D:\EDJD\2ano\IP3D\IP3DWork\Trabalho\bin\DesktopGL\AnyCPU\Debug\Content\sand-texture.jpg

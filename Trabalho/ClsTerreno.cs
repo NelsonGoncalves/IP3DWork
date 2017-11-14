@@ -31,9 +31,9 @@ namespace Trabalho
         {
             // Loading das texturas
             heightMap = content.Load<Texture2D>("lh3d1");
-            relva = content.Load<Texture2D>("relva");
+            relva = content.Load<Texture2D>("sand-texture");
             // set da escala para a altura do terreno
-            scale = 0.06f;
+            scale = 0.02f;
             // inicialização do efeito a usar
             effect = new BasicEffect(device); // instanciar
             effect.Projection = cam.projectionMatrix; // Projection matrix será universal
@@ -42,18 +42,17 @@ namespace Trabalho
             effect.VertexColorEnabled = false; // desligar as cores
             effect.TextureEnabled = true; // ligar as texturas
             effect.Texture = relva; // atribuir a relva como textura do terreno
-
+            
             effect.AmbientLightColor = new Vector3(1, 1, 1);
             effect.LightingEnabled = true; // liga a iluminação
             effect.DirectionalLight0.DiffuseColor = new Vector3(1, 1, 1); // a red light
-            effect.DirectionalLight0.Direction = new Vector3(1, 1, 1);  // coming along the x-axis
-            effect.DirectionalLight0.SpecularColor = new Vector3(1, 1, 1); // with green highlights
+            effect.DirectionalLight0.Direction = new Vector3(1, 0, 0);  // coming along the x-axis
+            effect.DirectionalLight0.SpecularColor = new Vector3(0.8f, 1f, 0.8f); // with green highlights
             //effect.AmbientLightColor = new Vector3(0.5f, 0.5f, 0.5f);
             //effect.EmissiveColor = new Vector3(1, 1, 0);
 
 
             LoadHeightData(heightMap); // Metodo responsável pelos valores das alturas do terreno
-            CreateNormals(); // Cria as normais de cada vértice (iluminação)
             CreateVertices(device); // Metodo responsável por criar os vértices e os respectivo buffer
             CreateIndices(device); // Metodo responável por criar os indices e os respectivo buffer
         }
@@ -129,7 +128,7 @@ namespace Trabalho
                         v1 = heightData[x - 1, z] - heightData[x, z];
                         v2 = heightData[x - 1, z - 1] - heightData[x, z];
                         v3 = heightData[x - 1, z] - heightData[x, z];
-                        n1 = Vector3.Cross(v1, v2); n2 = Vector3.Cross(v2, v3);
+                        n1 = Vector3.Cross(v1, v2); n2 = Vector3.Cross(v3, v2);
                         n = (n1 + n2) / 2.0f;
                     }
                     else if ((z > 0 && z < (terrainHeight - 1)) && x == (terrainWidth - 1))
@@ -188,6 +187,7 @@ namespace Trabalho
         // Preenche o array com os vertices
         private void CreateVertices(GraphicsDevice device)
         {
+            CreateNormals(); // Cria as normais de cada vértice (iluminação)
             // inicializa o array de texturas
             vertex = new VertexPositionNormalTexture[(terrainHeight) * (terrainWidth)];//(128*128)
 
@@ -197,8 +197,8 @@ namespace Trabalho
                 {
                     vertex[x + (z * terrainHeight)] = new VertexPositionNormalTexture(
                         new Vector3(x, heightData[x, z].Y, z), //Cria cada vertice com uma altura diferente acedendo ao heightData para cada (x,z)
-                        normals[x, z],// vector Up
-                        new Vector2((x % 2), (z % 2))); // x: pares serão sempre 0 e impares 1
+                        normals[x,z],// vector Up
+                        new Vector2((float)x/(terrainWidth-1),(float)z/(terrainHeight-1))); // x: pares serão sempre 0 e impares 1
                 }
             }
             // set do vertexBuffer
@@ -216,12 +216,12 @@ namespace Trabalho
             indexCount = 2 * terrainHeight * (terrainWidth - 1);
             // incialização do array de indices
             index = new short[indexCount]; // (32512)
-            for (int xi = 0; xi < terrainWidth - 1; xi++)//(127)
+            for (int x = 0; x < terrainWidth - 1; x++)//(127)
             {
-                for (int zi = 0; zi < terrainHeight; zi++)
+                for (int z = 0; z < terrainHeight; z++)
                 {
-                    index[(2 * zi) + 0 + (2 * xi * terrainHeight)] = (short)(zi * terrainWidth + xi); //0,128,256,...,16382
-                    index[(2 * zi) + 1 + (2 * xi * terrainWidth)] = (short)(zi * terrainHeight + 1 + xi); //1,129,257,...,16383
+                    index[(2 * z) + 0 + (2 * x * terrainHeight)] = (short)(z * terrainWidth + x); //0,128,256,...,16382
+                    index[(2 * z) + 1 + (2 * x * terrainWidth)] = (short)(z * terrainHeight +( 1 + x)); //1,129,257,...,16383
                 }
             }
             // set do indexBuffer
@@ -232,7 +232,7 @@ namespace Trabalho
             indexBuffer.SetData<short>(index); // atribuir o array de indices a usar na Draw
         }
         // Faz a interpolação das alturas
-        public float Interpolation(Vector3 position)
+        public Vector3 Bilinear(Vector3 position)
         {
             //Debug.WriteLine("X:" + cam.cameraPosition.X + "Y:" + cam.cameraPosition.Y + "Z:" + cam.cameraPosition.Z);
             //Debug.WriteLine("DirectionX" + cam.cameraTarget.X + "DirectionY:" + cam.cameraTarget.Y + "DirectionZ:" + cam.cameraTarget.Z);
@@ -262,12 +262,11 @@ namespace Trabalho
                                                  // 
             float yfinal = yab * dcZ + ycd * daZ; // (0.4*5.4f)+(0.6*6.2f) * 0.8 + (0.4*5.2f)+(0.6*6.0f) * 0.2
             position.Y = yfinal; // + 5 para a camera ficar à superficie o terreno
-            return position.Y;
+            return position;
         }
         // Metodo que devolve a normal numa determinada posição do terreno
         public Vector3 GetNormalInterpolation(Vector3 position)
         {
-            
             Vector2 upperLeft = new Vector2((int)position.X, (int)position.Z),
                 upperRight = new Vector2((int)position.X + 1, (int)position.Z),
                 lowerLeft = new Vector2((int)position.X, (int)position.Z + 1),
@@ -295,7 +294,7 @@ namespace Trabalho
         public void Update()
         {
         }
-        public void Draw(GraphicsDevice device,ClsCamara cam)
+        public void Draw(GraphicsDevice device, ClsCamara cam)
         {
             // update da View e da Projection Matrix devido ao input do utilizador
             effect.View = cam.viewMatrix;
@@ -303,6 +302,7 @@ namespace Trabalho
             // definir o vertexBuffer e indexBuffer a usar;
             device.SetVertexBuffer(vertexBuffer);
             device.Indices = indexBuffer;
+            effect.Texture = relva;
             effect.CurrentTechnique.Passes[0].Apply(); // apply das mudanças
             for (int i = 0; i < terrainWidth - 1; i++)
             {
